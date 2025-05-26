@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('user_panal');
+            $table->foreign('user_id')->references('id')->on('user_panals');
             
             $table->string('order_number');
 
