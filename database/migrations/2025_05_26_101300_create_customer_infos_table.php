@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('customer_infos', function (Blueprint $table) {
             $table->id();
-            $table->string('user_name');
+            
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('user_panal');
             
             $table->string('order_number');
 
@@ -21,40 +23,42 @@ return new class extends Migration
             $table->string('address');
             $table->string('phone');
 
-            $table->string('item_quentity');
-            $table->string('total_paid');
+            $table->integer('item_quentity'); //total quentity
+            $table->integer('total_paid'); //total price
 
-            $table->string('order_create_time')->default(now());
+            $table->string('order_create_time');
 
-            $table->string('discount');
-            $table->string('discount_user');
+            $table->integer('discount')->nullable(); //if
+            $table->string('discount_user')->nullable();
 
             $table->string('payment_method')->default('COD');
             $table->string('payment_status')->default('unpaid');
 
-            $table->string('confirm_time');
-            $table->string('confirm_user');
+            $table->string('confirm_time')->nullable();
+            $table->string('confirm_user')->nullable();
 
-            $table->string('shipping_fee');
-            $table->string('shipping_provider');
-            $table->string('shipping_provider_delivery_code');
-            $table->string('shipped_type');
-            $table->string('shipped_time');
-            $table->string('shipped_user');
-            $table->string('shippment_id');
+            $table->integer('shipping_fee'); // 60
+            $table->string('shipping_provider'); //pathao
 
-            $table->string('pre_payment');
-            $table->string('pre_payment_user');
+            $table->string('shipping_provider_delivery_code')->nullable();
+            
+            $table->string('shipped_type')->nullable(); //if outbound then pending confirm then change confirm
+            $table->string('shipped_time')->nullable();
+            $table->string('shipped_user')->nullable();
+            $table->integer('shippment_id')->nullable();
 
-            $table->string('order_note');
+            $table->integer('pre_payment')->nullable(); //if
+            $table->string('pre_payment_user')->nullable();
 
-            $table->string('hold_reason');
-            $table->string('hold_time');
+            $table->string('order_note')->nullable();
 
-            $table->string('cancel_reason');
-            $table->string('cancel_time');
+            $table->string('hold_reason')->nullable();
+            $table->string('hold_time')->nullable();
 
-            $table->string('delivery_time');
+            $table->string('cancel_reason')->nullable();
+            $table->string('cancel_time')->nullable();
+
+            $table->string('delivery_time')->nullable();
 
             $table->string('status')->default('Pending');
             $table->timestamps();

@@ -9,7 +9,8 @@
         <form action="">
             <div class="card alert-black">
                 <div class="card-header">
-                    <h1 class="card-title text-center text"> <span style="font-size: 30px" class="form-control btn btn-warning">Order Number: Ds1234</span> </h1>
+                    <h1 class="card-title text-center text"> <span style="font-size: 30px"
+                            class="form-control btn btn-warning">Order Number: Ds1234</span> </h1>
                 </div>
             </div>
             {{-- --------------------Customer info-------------- --}}
@@ -66,7 +67,6 @@
                     </div>
                 </div>
             </div>
-
             {{-- --------------------delivery info-------------- --}}
             <div class="card alert-info">
                 <div class="card-header">
@@ -121,7 +121,7 @@
                     </div>
                 </div>
             </div>
-            {{-- -----------------------------------Product Info--------------------------- --}}
+            {{-- --------------------Product Info--------------- --}}
             <div class="card alert-danger">
                 <div class="card-header">
                     <h4 class="card-title">Product Info</h4>
@@ -132,6 +132,7 @@
                             <tr>
                                 <th>Product id</th>
                                 <th>Product Name</th>
+                                <th>Price</th>
                                 <th>Product Image</th>
                                 <th>Quantity</th>
                                 <th>Unit Price</th>
@@ -145,12 +146,13 @@
                                     <p>{{ Str::limit('Mirpur 1 dhaka 1216 naryangang madanpur kolabagan khan monjil uttara', 30) }}
                                     </p>
                                 </td>
+                                <td>400</td>
                                 <td>
                                     <img src="" alt="" height="100" width="100">
                                 </td>
                                 <td>5</td>
                                 <td>300</td>
-                                
+
                                 <td>1500</td>
                             </tr>
                             <tr>
@@ -159,12 +161,13 @@
                                     <p>{{ Str::limit('Mirpur 1 dhaka 1216 naryangang madanpur kolabagan khan monjil uttara', 30) }}
                                     </p>
                                 </td>
+                                <td>400</td>
                                 <td>
                                     <img src="" alt="" height="100" width="100">
                                 </td>
                                 <td>5</td>
                                 <td>300</td>
-                                
+
                                 <td>1500</td>
                             </tr>
                         </tbody>
@@ -172,7 +175,7 @@
                 </div>
 
             </div>
-            {{-- -----------------------------------Old Order Info--------------------------- --}}
+            {{-- -------------------Old Order Info-------------- --}}
             <div class="card alert-black">
                 <div class="card-header">
                     <h4 class="card-title">Old Order Info</h4>
@@ -224,7 +227,7 @@
                 </div>
 
             </div>
-            {{-- --------------------Payment info-------------- --}}
+            {{-- --------------------Payment info--------------- --}}
             <div class="card alert-info">
                 <div class="card-header">
                     <h4 class="card-title">Payment Info</h4>
@@ -239,8 +242,7 @@
                         </div>
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Discount</label>
-                            <input type="text" class="form-control" value="100 Taka" placeholder="Status"
-                                >
+                            <input type="text" class="form-control" value="100 Taka" placeholder="Status">
                         </div>
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Pre Payment</label>
@@ -256,6 +258,7 @@
                 </div>
 
             </div>
+            {{-- ------------------Confirm Button--------------- --}}
             <div class="card alert-success">
                 <div class="card-header">
                     <h4 class="card-title">Confirmation</h4>
