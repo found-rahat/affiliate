@@ -13,8 +13,5 @@ class OrderInfoController extends Controller
         return view('orderinfo');
     }
 
-    public function orderlist(){
-        
-        return view('orderlist');
-    }
+    
 }

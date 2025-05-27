@@ -49,4 +49,9 @@ class CustomerInfo extends Model
         return $this->belongsTo(UserPanal::class, 'user_id');
     }
 
+    public function orderlist()
+    {
+        return $this->hasMany(OrderList::class);
+    }
+
 }

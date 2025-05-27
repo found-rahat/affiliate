@@ -8,6 +8,7 @@ use App\Http\Controllers\AddCartController;
 use App\Http\Controllers\CustomerInfoController;
 use App\Http\Controllers\OrderNowController;
 use App\Http\Controllers\OrderInfoController;
+use App\Http\Controllers\OrderListController;
 
 // Route::get('/', function () {
 //     return view('/dashboard');
@@ -77,7 +78,12 @@ Route::post('/ordernow',[CustomerInfoController::class, 'customerinsert'])->name
 //----------------------------Order info------------------------------
 
 Route::get('/orderinfo',[OrderInfoController::class,'index'])->name('orderinfo');
-Route::get('/orderlist',[OrderInfoController::class,'orderlist'])->name('user.orderlist');
+
+//-------------------------Order list----------------------
+
+Route::get('/orderlist',[OrderListController::class,'index'])->name('user.orderlist');
+
+// Route::get('/orderlist',[OrderListController::class,'showorder'])->name('user.orderlist');
 
 
 

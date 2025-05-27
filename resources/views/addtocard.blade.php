@@ -133,7 +133,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="note" class="form-label">Note ( optional )</label>
-                            <textarea name="note" type="text" class="form-control" id="note" required cols="30"
+                            <textarea name="note" type="text" class="form-control" id="note" cols="30"
                                 placeholder="Some note" rows="10"></textarea>
                         </div>
                     </div>

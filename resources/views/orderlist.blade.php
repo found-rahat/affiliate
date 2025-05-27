@@ -47,6 +47,7 @@
                                     <thead>
                                         <tr>
                                             <th>SL</th>
+                                            <th>Order Number</th>
                                             <th>Customer Info</th>
                                             <th>Price & Curior</th>
                                             <th>Image</th>
@@ -56,46 +57,62 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>
-                                                <p>Md. Rahat Ahmed</p>
-                                                <p>{{ Str::limit('Mirpur 1 dhaka 1216 naryangang madanpur kolabagan khan monjil uttara', 10) }}
-                                                </p>
-                                                <p>01980851423</p>
+                                        @php
+                                            $i = 1;
+                                        @endphp
+                                        @foreach ($customerInfo as $customer)
 
-                                            </td>
-                                            <td>250 + 60 = 310</td>
-                                            <td>
-                                                <img src="" alt="" height="100" width="100">
-                                            </td>
-                                            <td>15 Apr 2025</td>
-                                            <td>Pending</td>
-                                            <td>
-                                                <a class="from-control btn btn-info"
-                                                    href="{{ route('orderinfo') }}">info</a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>
-                                                <p>Md. Rahat Ahmed</p>
-                                                <p>{{ Str::limit('Mirpur 1 dhaka 1216 naryangang madanpur kolabagan khan monjil uttara', 10) }}
-                                                </p>
-                                                <p>01980851423</p>
 
-                                            </td>
-                                            <td>250 + 60 = 310</td>
-                                            <td>
-                                                <img src="" alt="" height="100" width="100">
-                                            </td>
-                                            <td>15 Apr 2025</td>
-                                            <td>Pending</td>
-                                            <td>
-                                                <a class="from-control btn btn-info"
-                                                    href="{{ route('orderinfo') }}">info</a>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td>{{ $i }}</td>
+                                                <td>{{ $customer->order_number }}</td>
+                                                <td>
+                                                    <p>{{ $customer->name }}</p>
+                                                    <p>{{ Str::limit($customer->address, 10) }}
+                                                    </p>
+                                                    <p>01980851423</p>
+
+                                                </td>
+                                                @php
+                                                    $total = $customer->total_paid + $customer->shipping_fee;
+                                                @endphp
+                                                <td>{{ $customer->total_paid }} + {{ $customer->shipping_fee }} <br>
+                                                    Total: {{ number_format($total, 2) }}</td>
+                                                <td>
+                                                    @foreach($customer->orderlist as $order)
+                                                        @php
+                                                            $product = $order->adminproduct;
+                                                        @endphp
+                                                        @if (!empty($product->image))
+                                                            @php
+                                                                $images = is_string($product->image)
+                                                                    ? json_decode($product->image, true)
+                                                                    : $product->image;
+                                                            @endphp
+
+                                                            @if (is_array($images))
+                                                                @foreach ($images as $img)
+                                                                    <img src="{{ asset('storage/' . $img) }}" height="100"
+                                                                        width="100" class="img-fluid rounded shadow"
+                                                                        alt="Product Image">
+                                                                @endforeach
+                                                            @endif
+                                                        @endif
+                                                        {{-- <p>{{$order->adminproduct->sku}}</p> --}}
+                                                    @endforeach
+                                                </td>
+                                                <td>{{ \Carbon\Carbon::parse($customer->order_create_time)->format('d M y') }}
+                                                </td>
+                                                <td>{{ $customer->status }}</td>
+                                                <td>
+                                                    <a class="from-control btn btn-info"
+                                                        href="{{ route('orderinfo') }}">info</a>
+                                                </td>
+                                            </tr>
+                                            @php
+                                                $i++;
+                                            @endphp
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>
