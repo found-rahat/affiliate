@@ -17,7 +17,7 @@
 
         <form action="{{ route('report.authenticate') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="card p-4">
+            <div class="card p-4 alert-secondary">
                 <h4 class="card-title mb-3">Report Details</h4>
 
                 <div class="row">
@@ -111,8 +111,7 @@
                                 <td>{!! Str::limit($report->admin_note, 10) !!}</td>
                                 <td>{{ $report->status }}</td>
                                 <td>
-                                    <a href="{{ route('user.reportsview', ['id' => $report->id]) }}"
-                                        class="btn btn-info">View</a>
+                                    <a href="{{ route('user.reportsview', ['id' => $report->id]) }}" class="btn btn-black">View</a>
 
 
                                 </td>

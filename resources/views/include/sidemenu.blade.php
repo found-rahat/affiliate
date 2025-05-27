@@ -82,7 +82,7 @@
                                 <p>Order List</p>
                                 @php
                                     $user = Auth::user();
-                                    $productCount = \App\Models\CustomerInfo::where('user_id', $user->id)->count();
+                                    $productCount = \App\Models\CustomerInfo::where('user_id', $user->id)->where('status','Pending')->count();
                                 @endphp
                                 <span class="badge badge-danger">{{$productCount}}</span>
                             </a>
