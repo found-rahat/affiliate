@@ -80,7 +80,11 @@
                             <a href="{{route('user.orderlist')}}">
                                 <i class="fas fa-list"></i>
                                 <p>Order List</p>
-                                <span class="badge badge-success">0</span>
+                                @php
+                                    $user = Auth::user();
+                                    $productCount = \App\Models\CustomerInfo::where('user_id', $user->id)->count();
+                                @endphp
+                                <span class="badge badge-danger">{{$productCount}}</span>
                             </a>
                         </li>
                         <li class="nav-item">
