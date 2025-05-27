@@ -106,8 +106,7 @@
                                                 </td>
                                                 <td>{{ $customer->status }}</td>
                                                 <td>
-                                                    <a class="from-control btn btn-info"
-                                                        href="{{ route('orderinfo') }}">info</a>
+                                                    <a class="from-control btn btn-info" href="{{ route('orderinfo',['order_number' => $customer->order_number]) }}">info</a>
                                                 </td>
                                             </tr>
                                             @php
