@@ -41,7 +41,6 @@ Route::get('/howtowork',[LoginController::class,'howtowork'])->name('user.howtow
 
 Route::get('/payment',[LoginController::class,'payment'])->name('user.payment');
 
-Route::get('/reportsview',[LoginController::class,'reportsview'])->name('user.reportsview');
 Route::get('/product',[LoginController::class,'product'])->name('user.product');
 
 
@@ -83,7 +82,7 @@ Route::get('/orderinfo',[OrderInfoController::class,'index'])->name('orderinfo')
 
 Route::get('/orderlist',[OrderListController::class,'index'])->name('user.orderlist');
 
-// Route::get('/orderlist',[OrderListController::class,'showorder'])->name('user.orderlist');
+// Route::get('/orderlist',[OrderListController::class,'showstatusformet'])->name('user.orderlist');
 
 
 

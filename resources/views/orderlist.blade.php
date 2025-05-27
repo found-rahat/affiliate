@@ -14,24 +14,26 @@
                 <div class="card alert-success">
                     <center>
                         <div class="card-header">
-                            <a href="?status=pending"><button style="margin:20px 0px;" type="button"
-                                    class="btn btn-info mb-3">Pending ()</button></a>
-                            <a href="?status=processing"><button style="margin:20px 0px;" type="button"
-                                    class="btn btn-success mb-3">Processing ()</button></a>
-                            <a href="?status=Hold"><button style="margin:20px 0px;" type="button"
-                                    class="btn btn-dark mb-3">Hold ()</button></a>
-                            <a href="?status=Packing"><button style="margin:20px 0px;" type="button"
-                                    class="btn btn-warning mb-3">Packing ()</button></a>
-                            <a href="?status=Shipped"><button style="margin:20px 0px;" type="button"
-                                    class="btn btn-dark mb-3">Shipped ()</button></a>
-                            <a href="?status=Delivered"><button style="margin:20px 0px;" type="button"
-                                    class="btn btn-success mb-3">Delivered ()</button></a>
-                            <a href="?status=delivery_Failed"><button style="margin:20px 0px;" type="button"
-                                    class="btn btn-danger mb-3">Delivery_Failed ()</button></a>
-                            <a href="?status=canceled"><button style="margin:20px 0px;" type="button"
-                                    class="btn btn-info mb-3">Canceled ()</button></a>
-                            <a href="?payment_status=unpaid"><button style="margin:20px 0px;" type="button"
-                                    class="btn btn-danger mb-3">Unpaid ()</button></a>
+
+                                <a href="?status=Pending"><button style="margin:20px 0px;" type="button"
+                                        class="btn btn-info mb-3">Pending ({{$pendingOrder}})</button></a>
+                                <a href="?status=Processing"><button style="margin:20px 0px;" type="button"
+                                        class="btn btn-success mb-3">Processing ({{$ProcessingOrder}})</button></a>
+                                <a href="?status=Hold"><button style="margin:20px 0px;" type="button"
+                                        class="btn btn-dark mb-3">Hold ({{$HoldOrder}})</button></a>
+                                <a href="?status=Packing"><button style="margin:20px 0px;" type="button"
+                                        class="btn btn-warning mb-3">Packing ({{$PackingOrder}})</button></a>
+                                <a href="?status=Shipped"><button style="margin:20px 0px;" type="button"
+                                        class="btn btn-dark mb-3">Shipped ({{$ShippedOrder}})</button></a>
+                                <a href="?status=Delivered"><button style="margin:20px 0px;" type="button"
+                                        class="btn btn-success mb-3">Delivered ({{$DeliveredOrder}})</button></a>
+                                <a href="?status=Delivery_Failed"><button style="margin:20px 0px;" type="button"
+                                        class="btn btn-danger mb-3">Delivery_Failed ({{$Delivery_FailedOrder}})</button></a>
+                                <a href="?status=Canceled"><button style="margin:20px 0px;" type="button"
+                                        class="btn btn-info mb-3">Canceled ({{$CanceledOrder}})</button></a>
+                                <a href="?payment_status=Unpaid"><button style="margin:20px 0px;" type="button"
+                                        class="btn btn-danger mb-3">Unpaid ({{$UnpaidOrder}})</button></a>
+                            
                         </div>
                     </center>
                 </div>
@@ -61,8 +63,6 @@
                                             $i = 1;
                                         @endphp
                                         @foreach ($customerInfo as $customer)
-
-
                                             <tr>
                                                 <td>{{ $i }}</td>
                                                 <td>{{ $customer->order_number }}</td>
@@ -79,7 +79,7 @@
                                                 <td>{{ $customer->total_paid }} + {{ $customer->shipping_fee }} <br>
                                                     Total: {{ number_format($total, 2) }}</td>
                                                 <td>
-                                                    @foreach($customer->orderlist as $order)
+                                                    @foreach ($customer->orderlist as $order)
                                                         @php
                                                             $product = $order->adminproduct;
                                                         @endphp
@@ -92,8 +92,9 @@
 
                                                             @if (is_array($images))
                                                                 @foreach ($images as $img)
-                                                                    <img src="{{ asset('storage/' . $img) }}" height="100"
-                                                                        width="100" class="img-fluid rounded shadow"
+                                                                    <img src="{{ asset('storage/' . $img) }}"
+                                                                        height="100" width="100"
+                                                                        class="img-fluid rounded shadow"
                                                                         alt="Product Image">
                                                                 @endforeach
                                                             @endif
