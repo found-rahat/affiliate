@@ -6,6 +6,8 @@ use App\Models\AddCart;
 use App\Models\AdminProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\CuriorServiceProviderCost;
+use App\Models\CustomerInfo;
 
 class OrderNowController extends Controller
 {
@@ -14,7 +16,11 @@ class OrderNowController extends Controller
         $user = Auth::user();
 
         $cartItems = AddCart::with('product')->where('user_name', $user->name)->get();
-        return view('addtocard', compact('cartItems'));
+        $curior = CuriorServiceProviderCost::get();
+        return view('addtocard',[
+            'curior' => $curior,
+            'cartItems' => $cartItems,
+        ]);
 
     }
 
@@ -37,7 +43,7 @@ class OrderNowController extends Controller
 
     public function ordernow()
     {
-         $product_list = AdminProduct::where('status', '1')->get();
+         $product_list = AdminProduct::where('status', 1)->get();
         return view('ordernow', [
             'product_lists' => $product_list,
         ]);
@@ -98,4 +104,7 @@ class OrderNowController extends Controller
 
         return redirect()->back()->with('error', 'Item not found.');
     }
+
+  
+
 }

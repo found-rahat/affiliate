@@ -11,5 +11,5 @@ class UserPanal extends Authenticatable
 {
 protected $table = 'user_panals';
    use HasFactory;
-   protected $fillable=['name','email','password',];
+   protected $fillable=['name','email','password','user_id'];
 }

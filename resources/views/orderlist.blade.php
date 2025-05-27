@@ -8,51 +8,10 @@
 
         <div class="row">
             <div>
-
+                @if (Session::has('success'))
+                    <div class="alert alert-success">{{ Session::get('success') }}</div>
+                @endif
                 <div class="card alert-success">
-
-                    {{-- <div class="col-md-12 p-4">
-                        <div class="row" style="margin-right: 0px">
-                            <div class="col-md-1">
-                                <a href="?status=pending"><button type="button"
-                                        class=" form-control btn btn-info ">Pending()</button></a>
-                            </div>
-                            <div class="col-md-2 ">
-                                <a href="?status=processing"><button type="button"
-                                        class=" form-control btn btn-success ">Processing()</button></a>
-                            </div>
-
-                            <div class="col-md-1 ">
-                                <a href="?status=Hold"><button type="button"
-                                        class=" form-control btn btn-dark ">Hold()</button></a>
-                            </div>
-                            <div class="col-md-1">
-                                <a href="?status=packing"><button type="button"
-                                        class=" form-control btn btn-danger ">Packing()</button></a>
-                            </div>
-                            <div class="col-md-1 ">
-                                <a href="?status=shipped"><button type="button"
-                                        class=" form-control btn btn-danger ">Shipped()</button></a>
-                            </div>
-                            <div class="col-md-2 ">
-                                <a href="?status=delivered"><button type="button"
-                                        class=" form-control btn btn-danger ">Delivered()</button></a>
-                            </div>
-                            <div class="col-md-2 ">
-                                <a href="?status=delivery_Failed"><button type="button"
-                                        class=" form-control btn btn-danger ">Delivery Failed()</button></a>
-                            </div>
-                            <div class="col-md-1 ">
-                                <a href="?status=canceled"><button type="button"
-                                        class="btn btn-info">Canceled()</button></a>
-                            </div>
-                            <div class="col-md-1 ">
-                                <a href="?payment_status=unpaid"><button type="button"
-                                        class="btn btn-danger">Unpaid()</button></a>
-                            </div>
-
-                        </div>
-                    </div> --}}
                     <center>
                         <div class="card-header">
                             <a href="?status=pending"><button style="margin:20px 0px;" type="button"
@@ -145,4 +104,11 @@
                 </div>
             </div>
         </div>
+        @if (Session::has('success'))
+            <script>
+                setTimeout(function() {
+                    location.reload();
+                }, 1000); // Reloads after 1 seconds
+            </script>
+        @endif
         @include('include.footer')

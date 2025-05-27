@@ -1,11 +1,13 @@
 <?php
 
-use App\Http\Controllers\AboutUsController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\OrderInfoController;
-use App\Http\Controllers\OrderNowController;
-use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AboutUsController;
+use App\Http\Controllers\AddCartController;
+use App\Http\Controllers\CustomerInfoController;
+use App\Http\Controllers\OrderNowController;
+use App\Http\Controllers\OrderInfoController;
 
 // Route::get('/', function () {
 //     return view('/dashboard');
@@ -62,17 +64,23 @@ Route::get('/about',[AboutUsController::class,'aboutus'])->name('user.about');
 //-----------------add to cart and order now------------------------
 Route::get('/ordernow',[OrderNowController::class,'ordernow'])->name('user.ordernow');
 Route::get('/productview',[OrderNowController::class,'productview'])->name('user.productview');
-Route::post('/ordernow',[OrderNowController::class,'addtocard'])->name('user.addtocard');
+Route::post('/productview',[OrderNowController::class,'addtocard'])->name('user.addtocard');
 Route::post('/addtocard',[OrderNowController::class,'addviewclick'])->name('user.addviewclick');
 Route::get('/addtocard',[OrderNowController::class,'buynow'])->name('user.clickicon');
 Route::post('/ordernow/update', [OrderNowController::class, 'updateCart'])->name('user.cart.update');
 Route::get('/addcard/delete/{id}', [OrderNowController::class, 'addcarddelete'])->name('user.addcarddelete');
+
+//---------------------- customer order info and orderlist, item also -----------------
+Route::post('/ordernow',[CustomerInfoController::class, 'customerinsert'])->name('user.order.submit');
 
 
 //----------------------------Order info------------------------------
 
 Route::get('/orderinfo',[OrderInfoController::class,'index'])->name('orderinfo');
 Route::get('/orderlist',[OrderInfoController::class,'orderlist'])->name('user.orderlist');
+
+
+
 
 
 
