@@ -31,7 +31,8 @@
                 sessionStorage.fonts = true;
             },
         });
-    </script>
+    </script>    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="user/assets/css/bootstrap.min.css" />

@@ -70,7 +70,7 @@
                                                     <p>{{ $customer->name }}</p>
                                                     <p>{{ Str::limit($customer->address, 10) }}
                                                     </p>
-                                                    <p>01980851423</p>
+                                                    <p>0{{ $customer->phone }}</p>
 
                                                 </td>
                                                 @php

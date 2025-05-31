@@ -22,6 +22,24 @@ class OrderInfoController extends Controller
             'query' => $query,
         ]);
     }
+    public function paymentUpdate(Request $request, $order_number){
+        $user = Auth::user();
+        $product = CustomerInfo::where('order_number', $order_number)->firstOrFail();
 
+        // Update values
+
+            $product->discount = $request->input('discount');
+            $product->discount_user = $user->name;
+
+
+            $product->pre_payment = $request->input('pre_payment');
+        $product->pre_payment_user = $user->name;
+
+        
+        
+
+        $product->save();
+        return redirect()->back()->with('success', 'Payment updated successfully.');
+    }
     
 }

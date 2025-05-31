@@ -64,6 +64,7 @@ Route::group(['middleware'=>'auth'],function(){
 
     //----------------------------Order info------------------------------
     Route::get('/orderinfo',[OrderInfoController::class,'index'])->name('orderinfo');
+    Route::post('/user/payment/update/{order_number}',[OrderInfoController::class,'paymentUpdate'])->name('user.payment.update');
 
 
 
