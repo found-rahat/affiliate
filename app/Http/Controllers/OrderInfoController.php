@@ -22,24 +22,42 @@ class OrderInfoController extends Controller
             'query' => $query,
         ]);
     }
-    public function paymentUpdate(Request $request, $order_number){
+    public function payment(Request $request){
+       $user = Auth::user();
+        $order_number = $request->query('order_number');
+
+        $query = CustomerInfo::with('orderlist.adminproduct')->where('order_number', $order_number)->get();
+        
+        return view('pre',[
+            'query' => $query,
+        ]);
+        
+    }
+    public function prepaymentUpdate(Request $request){
+
         $user = Auth::user();
-        $product = CustomerInfo::where('order_number', $order_number)->firstOrFail();
+        $order_number = $request->input('order_number');
 
-        // Update values
+        $customer = CustomerInfo::where('order_number', $order_number)->firstOrFail();
 
-            $product->discount = $request->input('discount');
-            $product->discount_user = $user->name;
+        $dataToUpdate = [];
 
+        if ($request->filled('pre_payment')) {
+            $dataToUpdate['pre_payment'] = $request->input('pre_payment');
+            $dataToUpdate['pre_payment_user'] = $user->name;
+        }
 
-            $product->pre_payment = $request->input('pre_payment');
-        $product->pre_payment_user = $user->name;
+        if ($request->filled('discount')) {
+            $dataToUpdate['discount'] = $request->input('discount');
+            $dataToUpdate['discount_user'] = $user->name;
+        }
 
-        
-        
+        if (!empty($dataToUpdate)) {
+            $customer->update($dataToUpdate);
+            return redirect()->route('user.orderlist')->with('success', 'Payment/Discount updated successfully!');
+        }
 
-        $product->save();
-        return redirect()->back()->with('success', 'Payment updated successfully.');
+        return redirect()->route('user.orderlist')->with('error', 'Nothing to update.');
     }
     
 }
