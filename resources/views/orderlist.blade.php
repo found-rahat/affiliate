@@ -68,10 +68,10 @@
                                                 <td>{{ $i }}</td>
                                                 <td>{{ $customer->order_number }}</td>
                                                 <td>
-                                                    <p>{{ $customer->name }}</p>
-                                                    <p>{{ Str::limit($customer->address, 10) }}
-                                                    </p>
-                                                    <p>0{{ $customer->phone }}</p>
+                                                    {{ $customer->name }} <br>
+                                                    {{ Str::limit($customer->address, 10) }} <br>
+
+                                                    0{{ $customer->phone }} <br>
                                                     <p class="btn btn-danger">{{ $customer->shipping_provider }}</p>
 
                                                 </td>
@@ -111,7 +111,7 @@
                                                             @if (is_array($images))
                                                                 @foreach ($images as $img)
                                                                     <img src="{{ asset('storage/' . $img) }}"
-                                                                        height="100" width="100"
+                                                                        height="70" width="70"
                                                                         class="img-fluid rounded shadow"
                                                                         alt="Product Image">
                                                                 @endforeach
