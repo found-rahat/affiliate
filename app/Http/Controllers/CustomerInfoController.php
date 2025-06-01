@@ -104,7 +104,7 @@ class CustomerInfoController extends Controller
         }
         // ----------------Add to Cart Delete--------------------
         AddCart::where('user_name', $user->name)->delete();
-        
+
         return redirect()->route('user.orderlist')->with('success', 'Order submitted successfully!');
     }
 }
