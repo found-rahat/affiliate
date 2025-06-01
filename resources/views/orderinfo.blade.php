@@ -16,7 +16,7 @@
                             class="form-control btn-warning">Order Number: {{ $customer->order_number }}</span> </h1>
                 @endforeach
             </div>
-        </div>      
+        </div>
         {{-- --------------------Customer info-------------- --}}
         <div class="card alert-success">
             <div class="card-header">
@@ -249,51 +249,58 @@
             <div class="card-header">
                 <h4 class="card-title">Payment Info</h4>
             </div>
-            <form action="{{ route('user.payment.update', ['order_number' => $customer->order_number]) }}"
-                method="POST">
-                <div class="p-4">
-                    <div class="row">
-                        @foreach ($query as $product)
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Total Price</label>
-                                <input type="text" class="form-control" value="{{ $product->total_paid }} Taka"
-                                    placeholder="Status" disabled>
-                            </div>
+            <div class="p-4">
+                <div class="row">
+                    @foreach ($query as $product)
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Total Price</label>
+                            <input type="text" class="form-control" value="{{ $product->total_paid }} Taka"
+                                placeholder="Status" disabled>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Delivery Charge</label>
+                            <input type="text" class="form-control" value="{{ $product->shipping_fee }} Taka"
+                                placeholder="Status" disabled>
+                        </div>
+                        @php
+                            $pre_payment = $customer->pre_payment ?? 0;
+                            $discount = $customer->discount ?? 0;
+                        @endphp
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Discount</label>
+                            <input type="text" name="discount" class="form-control" value="{{ $discount }} taka"
+                                disabled>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Pre Payment</label>
+                            <input type="text" name="pre_payment" class="form-control"
+                                value="{{ $pre_payment }} taka" disabled>
+                        </div>
+                        
 
-                            <div class="col-md-2 mb-3">
-                                <label class="form-label">Discount</label>
-                                <input type="number" name="discount" class="form-control"
-                                    value="{{ $product->discount }}">
-                            </div>
-                            <div class="col-md-2 mb-3">
-                                <label class="form-label">Pre Payment</label>
-                                <input type="number" name="pre_payment" class="form-control"
-                                    value="{{ $product->pre_payment }}">
-                            </div>
 
+
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Grand Total</label>
+                            @php
+                                $total = $product->total_paid + $product->shipping_fee - $product->discount - $product->pre_payment;
+                            @endphp
+                            <input type="text" class="form-control" value="{{ $total }} taka" disabled>
+                        </div>
+                        @if ($product->status == 'Pending')
                             <div class="col-md-2 mb-3">
                                 <label class="form-label">Update Payment</label>
 
-                                @csrf
-                                <button type="submit" class="form-control btn btn-secondary">Update
-                                    payment</button>
+                                <a class="form-control btn btn-secondary"
+                                    href="{{ route('prepayment', ['order_number' => $customer->order_number]) }}">Pay
+                                    now</a>
+
 
                             </div>
-
-
-
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Grand Total</label>
-                                @php
-                                    $total = $product->total_paid - $product->discount - $product->pre_payment;
-                                @endphp
-                                <input type="text" class="form-control" value="{{ $total }} taka"
-                                    disabled>
-                            </div>
-                        @endforeach
-                    </div>
+                        @endif
+                    @endforeach
                 </div>
-            </form>
+            </div>
         </div>
         {{-- ------------------Confirm Button--------------- --}}
         <div class="card alert-success">

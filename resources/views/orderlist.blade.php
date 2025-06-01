@@ -15,25 +15,26 @@
                     <center>
                         <div class="card-header">
 
-                                <a href="?status=Pending"><button style="margin:20px 0px;" type="button"
-                                        class="btn btn-info mb-3">Pending ({{$pendingOrder}})</button></a>
-                                <a href="?status=Processing"><button style="margin:20px 0px;" type="button"
-                                        class="btn btn-success mb-3">Processing ({{$ProcessingOrder}})</button></a>
-                                <a href="?status=Hold"><button style="margin:20px 0px;" type="button"
-                                        class="btn btn-dark mb-3">Hold ({{$HoldOrder}})</button></a>
-                                <a href="?status=Packing"><button style="margin:20px 0px;" type="button"
-                                        class="btn btn-warning mb-3">Packing ({{$PackingOrder}})</button></a>
-                                <a href="?status=Shipped"><button style="margin:20px 0px;" type="button"
-                                        class="btn btn-dark mb-3">Shipped ({{$ShippedOrder}})</button></a>
-                                <a href="?status=Delivered"><button style="margin:20px 0px;" type="button"
-                                        class="btn btn-success mb-3">Delivered ({{$DeliveredOrder}})</button></a>
-                                <a href="?status=Delivery_Failed"><button style="margin:20px 0px;" type="button"
-                                        class="btn btn-danger mb-3">Delivery_Failed ({{$Delivery_FailedOrder}})</button></a>
-                                <a href="?status=Canceled"><button style="margin:20px 0px;" type="button"
-                                        class="btn btn-info mb-3">Canceled ({{$CanceledOrder}})</button></a>
-                                <a href="?payment_status=Unpaid"><button style="margin:20px 0px;" type="button"
-                                        class="btn btn-danger mb-3">Unpaid ({{$UnpaidOrder}})</button></a>
-                            
+                            <a href="?status=Pending"><button style="margin:20px 0px;" type="button"
+                                    class="btn btn-info mb-3">Pending ({{ $pendingOrder }})</button></a>
+                            <a href="?status=Processing"><button style="margin:20px 0px;" type="button"
+                                    class="btn btn-success mb-3">Processing ({{ $ProcessingOrder }})</button></a>
+                            <a href="?status=Hold"><button style="margin:20px 0px;" type="button"
+                                    class="btn btn-dark mb-3">Hold ({{ $HoldOrder }})</button></a>
+                            <a href="?status=Packing"><button style="margin:20px 0px;" type="button"
+                                    class="btn btn-warning mb-3">Packing ({{ $PackingOrder }})</button></a>
+                            <a href="?status=Shipped"><button style="margin:20px 0px;" type="button"
+                                    class="btn btn-dark mb-3">Shipped ({{ $ShippedOrder }})</button></a>
+                            <a href="?status=Delivered"><button style="margin:20px 0px;" type="button"
+                                    class="btn btn-success mb-3">Delivered ({{ $DeliveredOrder }})</button></a>
+                            <a href="?status=Delivery_Failed"><button style="margin:20px 0px;" type="button"
+                                    class="btn btn-danger mb-3">Delivery_Failed
+                                    ({{ $Delivery_FailedOrder }})</button></a>
+                            <a href="?status=Canceled"><button style="margin:20px 0px;" type="button"
+                                    class="btn btn-info mb-3">Canceled ({{ $CanceledOrder }})</button></a>
+                            <a href="?status=Shipped"><button style="margin:20px 0px;" type="button"
+                                    class="btn btn-danger mb-3">Unpaid ({{ $UnpaidOrder }})</button></a>
+
                         </div>
                     </center>
                 </div>
@@ -71,13 +72,30 @@
                                                     <p>{{ Str::limit($customer->address, 10) }}
                                                     </p>
                                                     <p>0{{ $customer->phone }}</p>
+                                                    <p class="btn btn-danger">{{ $customer->shipping_provider }}</p>
 
                                                 </td>
                                                 @php
-                                                    $total = $customer->total_paid + $customer->shipping_fee;
+                                                    $total =
+                                                        $customer->total_paid +
+                                                        $customer->shipping_fee -
+                                                        $customer->pre_payment -
+                                                        $customer->discount;
+
+                                                    $pre_payment = $customer->pre_payment ?? 0;
+                                                    $discount = $customer->discount ?? 0;
                                                 @endphp
-                                                <td>{{ $customer->total_paid }} + {{ $customer->shipping_fee }} <br>
-                                                    Total: {{ number_format($total, 2) }}</td>
+                                                <td>
+                                                    T: {{ $customer->total_paid }} <br>
+                                                    C: {{ $customer->shipping_fee }} <br>
+                                                    P: {{ $pre_payment }} <br>
+                                                    D: {{ $discount }}<br>
+                                                    Total: {{ number_format($total, 2) }}<br>
+                                                    @if (!empty($customer->pre_payment))
+                                                        <p class="btn btn-warning">{{ $customer->pre_payment }}</p>
+                                                    @endif
+
+                                                </td>
                                                 <td>
                                                     @foreach ($customer->orderlist as $order)
                                                         @php
@@ -106,7 +124,9 @@
                                                 </td>
                                                 <td>{{ $customer->status }}</td>
                                                 <td>
-                                                    <a class="from-control btn btn-info" href="{{ route('orderinfo',['order_number' => $customer->order_number]) }}">info</a>
+                                                    <a class="from-control btn btn-info"
+                                                        href="{{ route('orderinfo', ['order_number' => $customer->order_number]) }}">info</a>
+
                                                 </td>
                                             </tr>
                                             @php

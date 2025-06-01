@@ -21,6 +21,7 @@ class OrderListController extends Controller
             $query = CustomerInfo::with('orderlist.adminproduct')->where('user_id', $user->id)->where('status',$status);
         }
 
+
         $customerInfos = $query->get();
         // ---------------------order list button -------------------
         $pendingOrder = CustomerInfo::where('user_id', $user->id)->where('status','Pending')->count();
@@ -31,7 +32,7 @@ class OrderListController extends Controller
         $DeliveredOrder = CustomerInfo::where('user_id', $user->id)->where('status','Delivered')->count();
         $Delivery_FailedOrder = CustomerInfo::where('user_id', $user->id)->where('status','Delivery_Failed')->count();
         $CanceledOrder = CustomerInfo::where('user_id', $user->id)->where('status','Canceled')->count();
-        $UnpaidOrder = CustomerInfo::where('user_id', $user->id)->where('status','Unpaid')->count();
+        $UnpaidOrder = CustomerInfo::where('user_id', $user->id)->where('payment_status','unpaid')->where('status','Shipped')->count();
 
         return view('orderlist', [
             'customerInfo' => $customerInfos,
