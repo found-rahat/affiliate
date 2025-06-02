@@ -96,6 +96,6 @@ class OrderInfoController extends Controller
         ]);
         return redirect()
             ->route('orderinfo', ['order_number' => $order_number])
-            ->with('success', 'Payment/Discount updated successfully!');
+            ->with('success', 'Information updated successfully!');
     }
 }

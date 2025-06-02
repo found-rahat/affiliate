@@ -23,8 +23,9 @@ class OrderList extends Model
       'status',
    ];
 
-public function adminproduct()
-{
-    return $this->belongsTo(AdminProduct::class, 'product_id');
-}
+   public function adminproduct()
+   {
+      return $this->belongsTo(AdminProduct::class, 'product_id');
+   }
+
 }
