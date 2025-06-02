@@ -9,12 +9,19 @@ use Filament\Tables\Table;
 use App\Models\CustomerInfo;
 use Filament\Resources\Resource;
 use Filament\Tables\Filters\Filter;
+use function Laravel\Prompts\select;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\Concerns\HasTabs;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Notification;
+use Filament\Forms\Components\Actions\Action;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 use App\Filament\Resources\CustomerInfoResource\Pages;
 use App\Filament\Resources\CustomerInfoResource\RelationManagers;
-use Filament\Resources\Concerns\HasTabs;
 
 class CustomerInfoResource extends Resource
 {
@@ -40,8 +47,36 @@ class CustomerInfoResource extends Resource
     {
         return $form
             ->schema([
-                //
-            ]);
+                Section::make('Customer Info')
+                    ->schema([
+                        TextInput::make('name')->columnSpan(2),
+                        TextInput::make('address')->columnSpan(2),
+                        TextInput::make('phone')->columnSpan(2),
+                        TextInput::make('order_create_time')->disabled(),
+                        TextInput::make('status')
+                            ->disabled(),
+                        TextInput::make('user.name')
+                            ->label('User')
+                            ->disabled()
+                            ->formatStateUsing(fn ($state, $record) => $record->user->name),
+                        TextInput::make('shipped_time')->disabled(),
+                    ])->collapsible()->columnSpan(2),
+                Section::make('Payment Information')
+                    ->schema([
+                        TextInput::make('total_paid')->readOnly()->columnSpan(2),
+                        TextInput::make('shipping_fee'),
+                        TextInput::make('shipping_provider'),
+                        TextInput::make('discount')->columnSpan(2),
+                        TextInput::make('pre_payment')->columnSpan(2),
+                        TextInput::make('user.id')->columnSpan(2)
+                            ->label('Grand Amount')
+                            ->readOnly()
+                                    ->formatStateUsing(function ($state, $record) {
+                            $total = ($record->total_paid + $record->shipping_fee) - (($record->pre_payment ?? 0) + ($record->discount ?? 0));
+                            return "{$total}";
+                        }),
+                    ])->columnSpan(2)->collapsible(),
+            ])->columns(4);
     }
 
     public static function table(Table $table): Table
@@ -49,22 +84,23 @@ class CustomerInfoResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('order_number')->searchable()->sortable()->toggleable(),
-                TextColumn::make('name')->label('Customer Info')->searchable()->sortable()->toggleable()
-                    ->html()
-                    ->getStateUsing(fn ($record) => "{$record->name}<br> {$record->address}<br>{$record->phone}"),
+                TextColumn::make('name')->label('Customer Info')->searchable()->sortable()->toggleable()->html()->getStateUsing(fn($record) => "{$record->name}<br> {$record->address}<br>{$record->phone}"),
                 TextColumn::make('user.name')->label('User'),
-                TextColumn::make('phone')->label('Amount')->searchable()->sortable()->toggleable()
+                TextColumn::make('phone')
+                    ->label('Amount')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable()
                     ->label('Amount')
                     ->html()
                     ->getStateUsing(function ($record) {
-                        $total = ($record->total_paid + $record->shipping_fee) - (($record->pre_payment ?? 0) + ($record->discount ?? 0));
-                        return "T: {$record->total_paid}<br>" .
-                            "C: {$record->shipping_fee}<br>" .
-                            "<strong>P: </strong>" . ($record->pre_payment ?? 0) . "<br>" .
-                            "D: " . ($record->discount ?? 0) . "<br>" .
-                            "<strong>Total:</strong> {$total}";
+                        $total = $record->total_paid + $record->shipping_fee - (($record->pre_payment ?? 0) + ($record->discount ?? 0));
+                        return "T: {$record->total_paid}<br>" . "C: {$record->shipping_fee}<br>" . '<strong>P: </strong>' . ($record->pre_payment ?? 0) . '<br>' . 'D: ' . ($record->discount ?? 0) . '<br>' . "<strong>Total:</strong> {$total}";
                     }),
-                TextColumn::make('address')->searchable()->sortable()->toggleable()
+                TextColumn::make('address')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable()
                     ->label('Product Images')
                     ->html()
                     ->getStateUsing(function ($record) {
@@ -86,61 +122,69 @@ class CustomerInfoResource extends Resource
                         });
 
                         // HTML বানিয়ে রিটার্ন
-                        return $allImages->map(function ($img) {
-                            $url = asset('storage/' . ltrim($img, '/'));
-                            return "<img src='{$url}' style='width:80px; height:80px; margin:5px; border-radius:4px;' />";
-                        })->implode('');
+                        return $allImages
+                            ->map(function ($img) {
+                                $url = asset('storage/' . ltrim($img, '/'));
+                                return "<img src='{$url}' style='width:80px; height:80px; margin:5px; border-radius:4px;' />";
+                            })
+                            ->implode('');
                     }),
 
-
-
-                
-                    TextColumn::make('order_create_time')->label('Order Date')->date('d M y')->searchable()->sortable()->toggleable(),
-                TextColumn::make('status')->label('Status')->searchable()->sortable()->toggleable()
+                TextColumn::make('order_create_time')->label('Order Date')->date('d M y')->searchable()->sortable()->toggleable(),
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable()
                     ->badge()
-                    ->formatStateUsing(fn (string $state) => ucfirst($state))
-                    ->icon(fn (string $state) => match ($state) {
-                        'Pending' => 'heroicon-o-clock',
-                        'Processing' => 'heroicon-o-pencil',
-                        'Hold' => 'heroicon-o-check-badge',
-                        'Packing' => 'heroicon-o-presentation-chart-line',
-                        'Shipped' => 'heroicon-o-shield-exclamation',
-                        'Delivered' => 'heroicon-o-heart',
-                        'Delivery_Failed' => 'heroicon-o-x-circle',
-                        'Canceled' => 'heroicon-o-exclamation-circle',
-                        default => null,
-                    })
-                    ->color(fn (string $state) => match ($state) {
-                        'Pending' => 'warning',
-                        'Processing' => '',
-                        'Hold' => 'danger',
-                        'Packing' => 'secondary',
-                        'Shipped' => 'info',
-                        'Delivered' => 'success',
-                        'Delivery_Failed' => 'danger',
-                        'Canceled' => 'danger',
-                        'Unpaid' => 'info',
-                        default => 'secondary',
-                    }),
+                    ->formatStateUsing(fn(string $state) => ucfirst($state))
+                    ->icon(
+                        fn(string $state) => match ($state) {
+                            'Pending' => 'heroicon-o-clock',
+                            'Processing' => 'heroicon-o-pencil',
+                            'Hold' => 'heroicon-o-check-badge',
+                            'Packing' => 'heroicon-o-presentation-chart-line',
+                            'Shipped' => 'heroicon-o-shield-exclamation',
+                            'Delivered' => 'heroicon-o-heart',
+                            'Delivery_Failed' => 'heroicon-o-x-circle',
+                            'Canceled' => 'heroicon-o-exclamation-circle',
+                            default => null,
+                        },
+                    )
+                    ->color(
+                        fn(string $state) => match ($state) {
+                            'Pending' => 'warning',
+                            'Processing' => '',
+                            'Hold' => 'danger',
+                            'Packing' => 'secondary',
+                            'Shipped' => 'info',
+                            'Delivered' => 'success',
+                            'Delivery_Failed' => 'danger',
+                            'Canceled' => 'danger',
+                            'Unpaid' => 'info',
+                            default => 'secondary',
+                        },
+                    ),
             ])
             ->filters([
+
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\ViewAction::make(), 
+                Tables\Actions\EditAction::make()->visible(fn (CustomerInfo $record) => in_array($record->status, ['Pending', 'Hold','Processing'])),
+                ])
+
+            ->bulkActions([Tables\Actions\BulkActionGroup::make([
+                Tables\Actions\DeleteBulkAction::make()
+                ])
             ]);
     }
 
     public static function getRelations(): array
     {
         return [
-            //
-        ];
+                //
+            ];
     }
 
     public static function getPages(): array
