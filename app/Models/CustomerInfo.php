@@ -66,4 +66,9 @@ class CustomerInfo extends Model
         );
     }
 
+    public function orderLists()
+{
+    return $this->hasMany(OrderList::class, 'order_number', 'order_number');
+}
+
 }

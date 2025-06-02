@@ -49,7 +49,7 @@
                 
             @endforeach
             <tr class="border-t font-bold">
-                <td class="px-6 py-2 text-right" colspan="2">Total</td>
+                <td class="px-6 py-2 text-right" colspan="3">Total</td>
                 <td class="px-6 py-2">{{ $totalQuantity }}</td>
                 <td class="px-6 py-2">—</td>
                 <td class="px-6 py-2">{{ number_format($totalAmount, 2) }}</td>

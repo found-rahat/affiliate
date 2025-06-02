@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\CustomerInfoResource\Pages;
 
-use App\Filament\Resources\CustomerInfoResource;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use App\Filament\Resources\CustomerInfoResource;
 
 class EditCustomerInfo extends EditRecord
 {
@@ -14,7 +15,19 @@ class EditCustomerInfo extends EditRecord
     {
         return [
             Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function getSavedNotification(): ?Notification
+{
+    return Notification::make()
+        ->success()
+        ->title('Customer Info Updated')
+        ->body('The Customer has been Updated successfully.');
+}
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('view', ['record' => $this->record]);
     }
 }
