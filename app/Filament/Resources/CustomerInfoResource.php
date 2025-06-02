@@ -7,19 +7,22 @@ use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\CustomerInfo;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Resources\Resource;
+use Illuminate\Support\Collection;
 use Filament\Tables\Filters\Filter;
 use function Laravel\Prompts\select;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Concerns\HasTabs;
 use Illuminate\Database\Eloquent\Builder;
+
 use Illuminate\Support\Facades\Notification;
 use Filament\Forms\Components\Actions\Action;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
 use App\Filament\Resources\CustomerInfoResource\Pages;
 use App\Filament\Resources\CustomerInfoResource\RelationManagers;
 
@@ -174,8 +177,22 @@ class CustomerInfoResource extends Resource
                 Tables\Actions\EditAction::make()->visible(fn (CustomerInfo $record) => in_array($record->status, ['Pending', 'Hold','Processing'])),
                 ])
 
-            ->bulkActions([Tables\Actions\BulkActionGroup::make([
-                Tables\Actions\DeleteBulkAction::make()
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+
+                    BulkAction::make('print_invoices')
+                        ->label('Print Invoices')
+                        ->action(function (Collection $records) {
+                            $pdf = Pdf::loadView('bulk-invoices', [
+                                'customers' => $records, // ✅ Ensure this is not null
+                            ]);
+
+                            return response()->streamDownload(
+                                fn () => print($pdf->output()),
+                                'bulk-customers.pdf'
+                            );
+                        })
                 ])
             ]);
     }
