@@ -54,4 +54,16 @@ class CustomerInfo extends Model
         return $this->hasMany(OrderList::class);
     }
 
+    public function orderProducts()
+    {
+        return $this->hasManyThrough(
+            AdminProduct::class,
+            OrderList::class,
+            'order_number',     // Foreign key on OrderList table
+            'id',               // Foreign key on AdminProduct table
+            'order_number',     // Local key on CustomerInfo table
+            'product_id'        // Local key on OrderList table
+        );
+    }
+
 }

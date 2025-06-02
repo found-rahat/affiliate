@@ -120,7 +120,7 @@ class CollectProductStockResource extends Resource
     }
     public static function table(Table $table): Table
     {
-        $latestCollectionNumber = CollectProductStock::orderBy('collection_number', 'desc')->first()?->collection_number;
+        $latestCollectionNumber = CollectProductStock::orderBy('id', 'desc')->first()?->collection_number;
         return $table
             ->columns([
                 TextColumn::make('index')->rowIndex()->label('SL')->sortable()->searchable()->toggleable(), 
