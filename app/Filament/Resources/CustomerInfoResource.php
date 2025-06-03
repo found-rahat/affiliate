@@ -16,10 +16,11 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Concerns\HasTabs;
-use Illuminate\Database\Eloquent\Builder;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Notification;
 use Filament\Forms\Components\Actions\Action;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -52,34 +53,33 @@ class CustomerInfoResource extends Resource
             ->schema([
                 Section::make('Customer Info')
                     ->schema([
-                        TextInput::make('name')->columnSpan(2),
-                        TextInput::make('address')->columnSpan(2),
-                        TextInput::make('phone')->columnSpan(2),
-                        TextInput::make('order_create_time')->disabled(),
-                        TextInput::make('status')
-                            ->disabled(),
-                        TextInput::make('user.name')
-                            ->label('User')
-                            ->disabled()
-                            ->formatStateUsing(fn ($state, $record) => $record->user->name),
-                        TextInput::make('shipped_time')->disabled(),
-                    ])->collapsible()->columnSpan(2),
+                        TextInput::make('name')->columnSpan(2), 
+                        TextInput::make('address')->columnSpan(2), 
+                        TextInput::make('phone')->columnSpan(2), 
+                        TextInput::make('order_create_time')->disabled(), 
+                        TextInput::make('status')->disabled(), 
+                        TextInput::make('user.name')->label('User')->disabled()
+                            ->formatStateUsing(fn($state, $record) => $record->user->name), 
+                        TextInput::make('shipped_time')->disabled()
+                        ])->collapsible()->columnSpan(2),
                 Section::make('Payment Information')
                     ->schema([
                         TextInput::make('total_paid')->readOnly()->columnSpan(2),
                         TextInput::make('shipping_fee'),
                         TextInput::make('shipping_provider'),
-                        TextInput::make('discount')->columnSpan(2),
+                        TextInput::make('discount')
+                            ->numeric()
+                            ->columnSpan(2)
+                            ->formatStateUsing(fn ($state) => $state ?? 0),
                         TextInput::make('pre_payment')->columnSpan(2),
-                        TextInput::make('user.id')->columnSpan(2)
-                            ->label('Grand Amount')
-                            ->readOnly()
-                                    ->formatStateUsing(function ($state, $record) {
-                            $total = ($record->total_paid + $record->shipping_fee) - (($record->pre_payment ?? 0) + ($record->discount ?? 0));
-                            return "{$total}";
-                        }),
+                        TextInput::make('user.id')->label('Grand Amount')->readOnly()
+                            ->formatStateUsing(function ($state, $record) {
+                                $total = $record->total_paid + $record->shipping_fee - (($record->pre_payment ?? 0) + ($record->discount ?? 0));
+                                return "{$total}";
+                            })->columnSpan(2),
                     ])->columnSpan(2)->collapsible(),
-            ])->columns(4);
+            ])
+            ->columns(4);
     }
 
     public static function table(Table $table): Table
@@ -87,7 +87,11 @@ class CustomerInfoResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('order_number')->searchable()->sortable()->toggleable(),
-                TextColumn::make('name')->label('Customer Info')->searchable()->sortable()->toggleable()->html()->getStateUsing(fn($record) => "{$record->name}<br> {$record->address}<br>{$record->phone}"),
+                TextColumn::make('name')->label('Customer Info')->searchable()->sortable()->toggleable()
+                    ->html()
+                    ->getStateUsing(
+                        fn($record) => "{$record->name}<br> {$record->address}<br>{$record->phone}"
+                    ),
                 TextColumn::make('user.name')->label('User'),
                 TextColumn::make('phone')
                     ->label('Amount')
@@ -169,31 +173,41 @@ class CustomerInfoResource extends Resource
                         },
                     ),
             ])
-            ->filters([
-
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\ViewAction::make(), 
-                Tables\Actions\EditAction::make()->visible(fn (CustomerInfo $record) => in_array($record->status, ['Pending', 'Hold','Processing'])),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn(CustomerInfo $record) => in_array($record->status, ['Pending', 'Hold', 'Processing']))
                 ])
 
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                // Tables\Actions\BulkActionGroup::make([
+                // Tables\Actions\DeleteBulkAction::make(),
 
-                    BulkAction::make('print_invoices')
-                        ->label('Print Invoices')
-                        ->action(function (Collection $records) {
-                            $pdf = Pdf::loadView('bulk-invoices', [
-                                'customers' => $records, // ✅ Ensure this is not null
-                            ]);
+                BulkAction::make('print_invoices')
+                    ->label('Print Invoices')
+                    ->color('success')
+                    ->icon('heroicon-o-printer')
+                    ->action(function (Collection $records) {
+                        $barcodes = [];
+                        $generator = new BarcodeGeneratorPNG();
 
-                            return response()->streamDownload(
-                                fn () => print($pdf->output()),
-                                'bulk-customers.pdf'
-                            );
-                        })
-                ])
+                        foreach ($records as $record) {
+                            $barcodeData = $generator->getBarcode($record->order_number, $generator::TYPE_CODE_128);
+                            $barcodes[$record->order_number] = base64_encode($barcodeData);
+                        }
+
+                        $pdf = Pdf::loadView('bulk-invoices', [
+                            'customers' => $records,
+                            'barcodes' => $barcodes, // ✅ Correct here
+                        ]);
+                        $pdf_name = \Carbon\Carbon::now()->format('Y-m-d H-i-s');
+                        return response()->streamDownload(
+                            fn() => print $pdf->output(), 
+                            $pdf_name . '.pdf'
+                        );
+                    }),
+                // ]),
             ]);
     }
 
