@@ -28,6 +28,8 @@ class ViewCustomerInfo extends ViewRecord
             ->requiresConfirmation()
             ->action(function (CustomerInfo $record) {
                 $record->status = 'Processing';
+                $record->confirm_user = Auth::user()->name;
+                $record->confirm_time = \Carbon\Carbon::now();
                 $record->save();
 
                 Notification::make()
