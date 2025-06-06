@@ -1,4 +1,9 @@
 <div>
+    {{-- <audio id="confirmSound" src="{{ asset('sounds/confirm.mp3') }}" preload="auto"></audio>
+    <audio id="dublicateSound" src="{{ asset('sounds/dublicate.mp3') }}" preload="auto"></audio>
+    <audio id="not_confirmSound" src="{{ asset('sounds/not_confirm.mp3') }}" preload="auto"></audio>
+    <audio id="not_foundSound" src="{{ asset('sounds/not_found.mp3') }}" preload="auto"></audio>
+    <audio id="setcodeSound" src="{{ asset('sounds/setcode.mp3') }}" preload="auto"></audio> --}}
     <div class="p-6 max-w-md mx-auto">
         <h2 class="text-lg font-semibold text-center mb-4">Scan Order to Auto Update</h2>
 
@@ -66,8 +71,7 @@
                         <td class="border px-4 py-2">{{ $item['item_quentity'] }}</td>
                         <td class="border px-4 py-2">
                             @if ($item['product_code'] == null)
-                                <input type="text" 
-                                    id="productInput-{{ $item['id'] }}"
+                                <input type="text" id="productInput-{{ $item['id'] }}"
                                     wire:model="productIds.{{ $item['id'] }}"
                                     wire:keydown.enter="SubmitProductIdlist({{ $item['id'] }})"
                                     placeholder="Scan Product Code"
@@ -79,7 +83,7 @@
                         <td class="border px-4 py-2">{{ $order['status'] ?? 'N/A' }}</td>
                         @if ($index === 0)
                             <td class="border px-4 py-2 text-center" rowspan="{{ count($order['items']) }}">
-                                <button wire:click="removeOrder({{ $order['id'] }})" 
+                                <button wire:click="removeOrder({{ $order['id'] }})"
                                     class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                     Remove
                                 </button>
@@ -100,6 +104,41 @@
 
     <script>
         document.addEventListener('livewire:init', () => {
+
+            //confirm sound play-------------
+            Livewire.on('play-confirm-sound', () => {
+                const sound = document.getElementById('confirmSound');
+                sound.currentTime = 0; // Rewind to start
+                sound.play().catch(e => console.log("Sound play failed:", e));
+            });
+            //dublicate sound play-------------
+            Livewire.on('play-dublicate-sound', () => {
+                const sound = document.getElementById('dublicateSound');
+                sound.currentTime = 0; // Rewind to start
+                sound.play().catch(e => console.log("Sound play failed:", e));
+            });
+            //not confirm sound play-------------
+            Livewire.on('play-not_confirm-sound', () => {
+                const sound = document.getElementById('not_confirmSound');
+                sound.currentTime = 0; // Rewind to start
+                sound.play().catch(e => console.log("Sound play failed:", e));
+            });
+
+            //not found sound play-------------
+            Livewire.on('play-not_found-sound', () => {
+                const sound = document.getElementById('not_foundSound');
+                sound.currentTime = 0; // Rewind to start
+                sound.play().catch(e => console.log("Sound play failed:", e));
+            });
+
+            //Set Product code sound play-------------
+            Livewire.on('play-set_product_code-sound', () => {
+                const sound = document.getElementById('setcodeSound');
+                sound.currentTime = 0; // Rewind to start
+                sound.play().catch(e => console.log("Sound play failed:", e));
+            });
+
+
             Livewire.on('focus-input', (data) => {
                 setTimeout(() => {
                     const input = document.getElementById(`productInput-${data.id}`);
@@ -109,7 +148,7 @@
                     }
                 }, 50);
             });
-            
+
             Livewire.on('focus-order-input', () => {
                 setTimeout(() => {
                     const input = document.getElementById('orderInput');
