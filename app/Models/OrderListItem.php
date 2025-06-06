@@ -19,4 +19,9 @@ class OrderListItem extends Model
         'item_price',
         'unit_price'
     ];
+
+    public function product()
+{
+    return $this->belongsTo(AdminProduct::class, 'product_id');
+}
 }
