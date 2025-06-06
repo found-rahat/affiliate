@@ -2,12 +2,13 @@
 
 namespace App\Livewire;
 
-use App\Models\CollectProductStockList;
 use Carbon\Carbon;
 use Livewire\Component;
+use App\Models\AdminProduct;
 use App\Models\CustomerInfo;
 use App\Models\OrderListItem;
 use Illuminate\Support\Facades\Auth;
+use App\Models\CollectProductStockList;
 use Filament\Notifications\Notification;
 
 class Shipped extends Component
@@ -15,6 +16,7 @@ class Shipped extends Component
     public $orderNumber;
     public $pendingOrders = [];
     public $productIds = [];
+    public $matchedProductImages = [];
     public $disableOrderInput = false;
     public $productInputsPending = [];
 
@@ -25,11 +27,7 @@ class Shipped extends Component
 
     public function loadPendingOrders()
     {
-        $this->pendingOrders = CustomerInfo::with('items.product')
-            ->where('shipped_type', 'Pending')
-            ->latest()
-            ->get()
-            ->toArray();
+        $this->pendingOrders = CustomerInfo::with('items.product')->where('shipped_type', 'Pending')->latest()->get()->toArray();
     }
 
     public function submitOrderNumber()
@@ -38,12 +36,12 @@ class Shipped extends Component
             return;
         }
 
-        $order = CustomerInfo::with('items.product')
-            ->where('order_number', $this->orderNumber)
-            ->first();
+        $order = CustomerInfo::with('items.product')->where('order_number', $this->orderNumber)->first();
 
         if (!$order) {
             session()->flash('error', "Order '{$this->orderNumber}' not found.");
+            $this->dispatch('play-not_found-sound');
+
             Notification::make()
                 ->danger()
                 ->title('Not Found')
@@ -60,11 +58,7 @@ class Shipped extends Component
                 $order->save();
 
                 // Clear and rebuild pending orders list
-                $this->pendingOrders = CustomerInfo::with('items.product')
-                    ->where('shipped_type', 'Pending')
-                    ->latest()
-                    ->get()
-                    ->toArray();
+                $this->pendingOrders = CustomerInfo::with('items.product')->where('shipped_type', 'Pending')->latest()->get()->toArray();
 
                 $this->disableOrderInput = true;
                 $this->productInputsPending = [];
@@ -80,7 +74,7 @@ class Shipped extends Component
                 if (!empty($this->productInputsPending)) {
                     $this->dispatch('focus-input', id: $this->productInputsPending[0]);
                 }
-
+                $this->dispatch('play-confirm-sound');
                 session()->flash('success', "Order #{$order->order_number} set to Confirm.");
                 Notification::make()
                     ->success()
@@ -88,6 +82,8 @@ class Shipped extends Component
                     ->body("Order #{$order->order_number} set to Confirm.")
                     ->send();
             } else {
+                $this->dispatch('play-dublicate-sound');
+
                 session()->flash('error', "Order Number '{$this->orderNumber}' is Duplicate");
                 Notification::make()
                     ->danger()
@@ -96,6 +92,7 @@ class Shipped extends Component
                     ->send();
             }
         } else {
+            $this->dispatch('play-not_confirm-sound');
             session()->flash('error', "Order Number '{$this->orderNumber}' is not Confirm.");
             Notification::make()
                 ->danger()
@@ -119,14 +116,14 @@ class Shipped extends Component
 
             $this->loadPendingOrders();
             $this->disableOrderInput = false;
-            
+
             session()->flash('success', "Order #{$order->order_number} removed successfully.");
             Notification::make()
                 ->success()
                 ->title('Order Removed')
                 ->body("Order #{$order->order_number} removed successfully.")
                 ->send();
-            
+
             $this->dispatch('focus-order-input');
         } else {
             session()->flash('error', 'Order not found.');
@@ -138,11 +135,36 @@ class Shipped extends Component
         $productId = $this->productIds[$itemId] ?? null;
 
         if (!$productId) {
+            session()->flash('error', 'No Product Code Provided.');
             return;
         }
 
         $orderItem = OrderListItem::find($itemId);
         $product = CollectProductStockList::find($productId);
+
+        // $adminProduct = AdminProduct::find($product->admin_product_id);
+        if (!$product) {
+            session()->flash('error', "Product ID {$productId} not found in stock.");
+            $this->dispatch('play-not_found-sound');
+
+            Notification::make()
+                ->danger()
+                ->title('Product Not Found')
+                ->body("Product ID '{$this->orderNumber}' not found in stock.")
+                ->send();
+            return;
+        }
+
+        if ($product->admin_product_id) {
+            $adminProduct = AdminProduct::find($product->admin_product_id);
+            if ($adminProduct && $adminProduct->image) {
+                $images = is_array($adminProduct->image) ? $adminProduct->image : json_decode($adminProduct->image, true);
+
+                if (is_array($images)) {
+                    $this->matchedProductImages[$itemId] = $images[0] ?? null;
+                }
+            }
+        }
 
         if ($orderItem) {
             $orderItem->product_code = $productId;
@@ -150,7 +172,7 @@ class Shipped extends Component
             $orderItem->packing_user = Auth::user()->name;
             $orderItem->order_status = 'sold';
             $orderItem->save();
-
+            $this->dispatch('play-set_product_code-sound');
             unset($this->productIds[$itemId]);
             $this->loadPendingOrders();
         }
@@ -163,19 +185,13 @@ class Shipped extends Component
             $product->stock_status = 'sold';
             $product->save();
 
+            $this->dispatch('play-set_product_code-sound');
             session()->flash('success', 'Product added successfully.');
-            Notification::make()
-                ->success()
-                ->title('Product Added')
-                ->body('Product added successfully.')
-                ->send();
+            Notification::make()->success()->title('Product Added')->body('Product added successfully.')->send();
         }
 
         // Remove from pending list
-        $this->productInputsPending = array_values(array_filter(
-            $this->productInputsPending,
-            fn($id) => $id != $itemId
-        ));
+        $this->productInputsPending = array_values(array_filter($this->productInputsPending, fn($id) => $id != $itemId));
 
         // Focus on next input or re-enable order input
         if (!empty($this->productInputsPending)) {
