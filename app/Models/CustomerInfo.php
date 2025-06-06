@@ -71,4 +71,9 @@ class CustomerInfo extends Model
     return $this->hasMany(OrderList::class, 'order_number', 'order_number');
 }
 
+public function items()
+{
+    return $this->hasMany(OrderListItem::class, 'customer_info_id');
+}
+
 }
