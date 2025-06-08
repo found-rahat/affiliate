@@ -16,6 +16,7 @@ class Shipped extends Component
     public $orderNumber;
     public $pendingOrders = [];
     public $productIds = [];
+
     public $matchedProductImages = [];
     public $disableOrderInput = false;
     public $productInputsPending = [];
@@ -108,6 +109,9 @@ class Shipped extends Component
     {
         $order = CustomerInfo::find($orderId);
 
+        $orderItems = OrderListItem::where('order_number', $order->order_number)->get();
+        $product = CollectProductStockList::where('Order_number', $order->order_number)->first();
+
         if ($order) {
             $order->shipped_time = null;
             $order->shipped_type = null;
@@ -125,8 +129,23 @@ class Shipped extends Component
                 ->send();
 
             $this->dispatch('focus-order-input');
-        } else {
-            session()->flash('error', 'Order not found.');
+        }
+
+        foreach ($orderItems as $item) {
+            $item->product_code = null;
+            $item->packing_time = null;
+            $item->packing_user = null;
+            $item->order_status = 'Pending';
+            $item->save();
+        }
+
+        if ($product) {
+            $product->Order_number = null;
+            $product->packing_time = null;
+            $product->packing_user = null;
+            $product->sell_price = null;
+            $product->stock_status = 'Instock';
+            $product->save();
         }
     }
 
@@ -151,6 +170,17 @@ class Shipped extends Component
                 ->danger()
                 ->title('Product Not Found')
                 ->body("Product ID '{$this->orderNumber}' not found in stock.")
+                ->send();
+            return;
+        }
+        if ($product->stock_status === 'sold') {
+            session()->flash('error', "Product code {$productId} is already marked as Sold.");
+            $this->dispatch('play-not_found-sound');
+
+            Notification::make()
+                ->danger()
+                ->title('Sold Product')
+                ->body("Product code #{$productId} is already marked as Sold.")
                 ->send();
             return;
         }
