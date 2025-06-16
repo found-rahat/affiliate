@@ -275,8 +275,7 @@ class Shipped extends Component
     }
 
 
-    public function shippedList()
-    {
+    public function shippedList(){
         return redirect('/admin/shipped-list');
     }
 
