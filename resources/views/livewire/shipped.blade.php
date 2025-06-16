@@ -4,6 +4,17 @@
     <audio id="not_confirmSound" src="{{ asset('sounds/not_confirm.mp3') }}" preload="auto"></audio>
     <audio id="not_foundSound" src="{{ asset('sounds/not_found.mp3') }}" preload="auto"></audio>
     <audio id="setcodeSound" src="{{ asset('sounds/setcode.mp3') }}" preload="auto"></audio> --}}
+
+        <div class="p-4 " style="">
+        <button wire:click="clearAll"
+            style="border-radius:5px;background-color:rgb(217, 217, 217); padding: 10px; color:rgb(0, 0, 0)">
+            Clear
+        </button>
+        <button wire:click="shippedList"
+            style="float: right; border-radius:5px;background-color:rgb(5, 143, 255); padding: 10px; color:white">
+            Confirm to Next page
+        </button>
+    </div>
     <div class="p-6 max-w-md mx-auto">
         <h2 class="text-lg font-semibold text-center mb-4">Scan Order to Auto Update</h2>
         <input type="text" id="orderInput" wire:model="orderNumber" wire:keydown.enter="submitOrderNumber"
@@ -23,8 +34,6 @@
         @endif
     </div>
     {{-- @if ($pendingOrders) --}}
-        
-    
 
     <table class="w-full table-auto border border-collapse border-gray-300">
         <thead>
@@ -172,16 +181,7 @@
         </tbody>
 
     </table>
-    <div class="p-4 " style="">
-        <button wire:click="clearAll"
-            style="border-radius:5px;background-color:rgb(217, 217, 217); padding: 10px; color:rgb(0, 0, 0)">
-            Clear
-        </button>
-        <button
-            style="float: right; border-radius:5px;background-color:rgb(5, 143, 255); padding: 10px; color:white">
-            Next
-        </button>
-    </div>
+    
 {{-- @endif --}}
     <script>
         document.addEventListener('livewire:init', () => {

@@ -164,6 +164,7 @@ class Shipped extends Component
 
         // $adminProduct = AdminProduct::find($product->admin_product_id);
         if (!$product) {
+            unset($this->productIds[$itemId]);
             session()->flash('error', "Product ID '{$productId}' not found in stock.");
             $this->dispatch('play-not_found-sound');
 
@@ -175,6 +176,7 @@ class Shipped extends Component
             return;
         }
         if ($product->stock_status === 'sold') {
+            unset($this->productIds[$itemId]);
             session()->flash('error', "Product #{$productId} is already Sold and can't be updated.");
             $this->dispatch('play-not_found-sound');
 
@@ -270,6 +272,12 @@ class Shipped extends Component
             ->send();
         $this->dispatch('reloadPage');
 
+    }
+
+
+    public function shippedList()
+    {
+        return redirect('/admin/shipped-list');
     }
 
     public function render(){
