@@ -1,12 +1,11 @@
 <div>
-    <audio id="confirmSound" src="{{ asset('sounds/confirm.mp3') }}" preload="auto"></audio>
+    {{-- <audio id="confirmSound" src="{{ asset('sounds/confirm.mp3') }}" preload="auto"></audio>
     <audio id="dublicateSound" src="{{ asset('sounds/dublicate.mp3') }}" preload="auto"></audio>
     <audio id="not_confirmSound" src="{{ asset('sounds/not_confirm.mp3') }}" preload="auto"></audio>
     <audio id="not_foundSound" src="{{ asset('sounds/not_found.mp3') }}" preload="auto"></audio>
-    <audio id="setcodeSound" src="{{ asset('sounds/setcode.mp3') }}" preload="auto"></audio>
+    <audio id="setcodeSound" src="{{ asset('sounds/setcode.mp3') }}" preload="auto"></audio> --}}
     <div class="p-6 max-w-md mx-auto">
         <h2 class="text-lg font-semibold text-center mb-4">Scan Order to Auto Update</h2>
-
         <input type="text" id="orderInput" wire:model="orderNumber" wire:keydown.enter="submitOrderNumber"
             placeholder="Scan Order Number" @if ($disableOrderInput) disabled @endif
             class="w-full border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -23,19 +22,22 @@
             </div>
         @endif
     </div>
+    {{-- @if ($pendingOrders) --}}
+        
+    
 
     <table class="w-full table-auto border border-collapse border-gray-300">
         <thead>
             <tr class="bg-gray-100">
-                <th class="border px-4 py-2">product id</th>
-                <th class="border px-4 py-2">customer id</th>
-                <th class="border px-4 py-2">Order List Id</th>
+                <th class="border px-4 py-2">SL</th>
+                <th class="border px-4 py-2">Product id</th>
                 <th class="border px-4 py-2">Order Number</th>
-                <th class="border px-4 py-2">Name</th>
-                <th class="border px-4 py-2">Image</th>
-                <th class="border px-4 py-2">match</th>
+                <th class="border px-4 py-2">Customer Info</th>
+                <th class="border px-4 py-2">Total Payment</th>
+                <th class="border px-4 py-2">Product Title</th>
+                <th class="border px-4 py-2">Images</th>
+                <th class="border px-4 py-2">Match Images</th>
                 <th class="border px-4 py-2">Product Code</th>
-                <th class="border px-4 py-2">Status</th>
                 <th class="border px-4 py-2">Action</th>
             </tr>
         </thead>
@@ -44,11 +46,48 @@
             @forelse ($pendingOrders as $order)
                 @foreach ($order['items'] as $index => $item)
                     <tr>
-                        <td class="border px-4 py-2">{{ $item['product_id'] }}</td>
-                        <td class="border px-4 py-2">{{ $order['id'] }}</td>
-                        <td class="border px-4 py-2">{{ $item['id'] }}</td>
-                        <td class="border px-4 py-2">{{ $order['order_number'] ?? 'N/A' }}</td>
-                        <td class="border px-4 py-2">{{ $item['product']['product_name'] ?? 'N/A' }}</td>
+                        <td class="border px-4 py-2">{{ $id }}</td>
+                        <td class="border px-4 py-2"> {{ $item['product_id'] }} </td>
+                        @if ($index === 0)
+                            <td rowspan="{{ count($order['items']) }}" class="border px-4 py-2">
+                                {{ $order['order_number'] ?? 'N/A' }}
+
+                            </td>
+                        @endif
+                        @if ($index === 0)
+                            <td rowspan="{{ count($order['items']) }}" class="border px-4 py-2">
+                                {!! 'N: ' . $order['name'] . '<br>' . 'A: ' . $order['address'] . '<br>' . 'P: ' . $order['phone'] !!}
+
+                            </td>
+                        @endif
+                        @php
+                            $totalPaid = $order['total_paid'];
+                            $shipping_cost = $order['shipping_fee'];
+                            $pre_payment = $order['pre_payment'] ?? 0;
+                            $discount = $order['discount'] ?? 0;
+
+                            $total_collection = $totalPaid + $shipping_cost - $pre_payment - $discount;
+                        @endphp
+                        @if ($index === 0)
+                            <td rowspan="{{ count($order['items']) }}" class="border px-4 py-2">
+                                {!! 'C: ' .
+                                    $totalPaid .
+                                    '<br>' .
+                                    'F: ' .
+                                    $shipping_cost .
+                                    '<br>' .
+                                    'P: ' .
+                                    $pre_payment .
+                                    '<br>' .
+                                    'D: ' .
+                                    $discount .
+                                    '<br>' .
+                                    'T: ' .
+                                    $total_collection !!}
+                            </td>
+                        @endif
+                        <td class="border px-4 py-2">{{ Str::limit($item['product']['product_name'] ?? 'N/A', 30) }}
+                        </td>
                         <td class="border px-4 py-2">
                             @php
                                 $product = $item['product'];
@@ -111,7 +150,6 @@
                                 {{ $item['product_code'] }}
                             @endif
                         </td>
-                        <td class="border px-4 py-2">{{ $order['status'] ?? 'N/A' }}</td>
                         @if ($index === 0)
                             <td class="border px-4 py-2 font-semibold text-green-600"
                                 rowspan="{{ count($order['items']) }}">
@@ -132,8 +170,19 @@
                 </tr>
             @endforelse
         </tbody>
-    </table>
 
+    </table>
+    <div class="p-4 " style="">
+        <button wire:click="clearAll"
+            style="border-radius:5px;background-color:rgb(217, 217, 217); padding: 10px; color:rgb(0, 0, 0)">
+            Clear
+        </button>
+        <button
+            style="float: right; border-radius:5px;background-color:rgb(5, 143, 255); padding: 10px; color:white">
+            Next
+        </button>
+    </div>
+{{-- @endif --}}
     <script>
         document.addEventListener('livewire:init', () => {
 
@@ -170,6 +219,10 @@
                 sound.play().catch(e => console.log("Sound play failed:", e));
             });
 
+            Livewire.on('reloadPage', () => {
+                location.reload();
+            });
+
 
             Livewire.on('focus-input', (data) => {
                 setTimeout(() => {
@@ -191,5 +244,10 @@
                 }, 50);
             });
         });
+
+        window.addEventListener('reload-page', event => {
+            location.reload();
+        });
     </script>
+
 </div>

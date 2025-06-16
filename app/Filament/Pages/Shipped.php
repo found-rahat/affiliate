@@ -11,4 +11,9 @@ class Shipped extends Page
     protected static ?int $navigationSort = 10;
 
     protected static string $view = 'filament.pages.shipped';
+
+    public static function canAccess(): bool
+    {
+        return auth()->check() && auth()->user()->hasPermissionTo('Shipped as View');
+    }
 }
