@@ -15,6 +15,7 @@ use Filament\Resources\Resource;
 use App\Models\CollectionUserInfo;
 use App\Models\CollectProductStock;
 use Filament\Tables\Filters\Filter;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use App\Models\CollectProductStockList;
 use Filament\Tables\Actions\BulkAction;
@@ -41,7 +42,6 @@ class CollectProductStockResource extends Resource
     {
         return false;
     }
-        
     public static function form(Form $form): Form
     {
         return $form
@@ -122,6 +122,13 @@ class CollectProductStockResource extends Resource
     {
         $latestCollectionNumber = CollectProductStock::orderBy('id', 'desc')->first()?->collection_number;
         return $table
+        ->query(
+        fn () => Auth::user()->can('view all shipped lists')
+            ? CollectProductStock::query()->with('adminProducts', 'user') // ✅ admin sees all
+            : CollectProductStock::query()
+                ->with('adminProducts', 'user')
+                ->where('collection_user', Auth::id()) // ✅ only own data
+    )
             ->columns([
                 TextColumn::make('index')->rowIndex()->label('SL')->sortable()->searchable()->toggleable(), 
                 TextColumn::make('collection_number')->label('Collection id')->sortable()->searchable()->toggleable(),
@@ -134,6 +141,7 @@ class CollectProductStockResource extends Resource
                 TextColumn::make('user.name')->label('Collection User')->limit(25)->sortable()->searchable()->toggleable(),
                 TextColumn::make('created_at')->datetime('d M y')
             ])
+            ->defaultSort('id', 'desc')
             ->filters([
                 Filter::make('latest_collection')
                     ->label('Latest Collection')

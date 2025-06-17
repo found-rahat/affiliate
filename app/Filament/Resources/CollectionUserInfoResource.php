@@ -30,7 +30,17 @@ class CollectionUserInfoResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-currency-bangladeshi';
     protected static ?string $navigationGroup = 'Product Management';
-    
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (!Auth::user()->can('view all shipped lists')) {
+            $query->where('collection_user', Auth::user()->id);
+        }
+
+        return $query;
+    }
     public static function form(Form $form): Form
     {
         return $form
@@ -113,17 +123,18 @@ class CollectionUserInfoResource extends Resource
                     
                 TextColumn::make('created_at')->dateTime('d M y'),
             ])
+            ->defaultSort('id', 'desc')
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                // Tables\Actions\ViewAction::make(),
+                // Tables\Actions\EditAction::make(),
+                // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    // Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -142,7 +153,6 @@ class CollectionUserInfoResource extends Resource
             'create' => Pages\CreateCollectionUserInfo::route('/create'),
             'view' => Pages\ViewCollectionUserInfo::route('/{record}'),
             'edit' => Pages\EditCollectionUserInfo::route('/{record}/edit'),
-            'view-collected-products' => ViewCollectedProducts::route('/{recordId}/view-collected-products'),
         ];
     }
 }
