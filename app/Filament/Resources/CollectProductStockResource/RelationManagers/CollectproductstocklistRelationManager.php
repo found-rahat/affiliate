@@ -35,9 +35,9 @@ class CollectproductstocklistRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('admin_product_id')
             ->columns([
-                // TextColumn::make('admin_product_id'),
+                TextColumn::make('id'),
                 ImageColumn::make('AdminProduct.image'),
-                TextColumn::make('AdminProduct.product_name'),
+                TextColumn::make('AdminProduct.product_name')->limit(25),
                 TextColumn::make('buy_price'),
                 TextColumn::make('user.name'),
                 TextColumn::make('stock_status'),

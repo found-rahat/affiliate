@@ -1,19 +1,19 @@
 <x-filament::page>
-<p class="text-2xl font-bold mb-4">Collection Number #{{ $user->collection_number }}</p>
-<p class="text-2xl font-bold mb-4">Collection User #{{ $user->user->name }}</p>
-
-    <table class="min-w-full divide-y divide-gray-200">
-        <thead>
-            <tr>
-                <th class="px-6 py-3 text-left">#</th>
-                <th class="px-6 py-3 text-left">Image</th>
-                <th class="px-6 py-3 text-left">Colelct User</th>
-                <th class="px-6 py-3 text-left">Product Name</th>
-                <th class="px-6 py-3 text-left">Quantity</th>
-                <th class="px-6 py-3 text-left">Total</th>
-            </tr>
-        </thead>
-        <tbody>
+    <x-filament::card>
+        <div>
+            <p style="text-align: center;background-color:#ebebeb" class="mb-4 p-4">Collection Number #{{ $user->collection_number }} <br> Collection User {{ $user->user->name }} </p>
+            <table class="w-full border text-sm">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="border px-4 py-2">SL</th>
+                        <th class="border px-4 py-2">Image</th>
+                        <th class="border px-4 py-2">Colelct User</th>
+                        <th class="border px-4 py-2">Product Name</th>
+                        <th class="border px-4 py-2">Quantity</th>
+                        <th class="border px-4 py-2">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
 
             @php
                 $totalQuantity = 0;
@@ -27,8 +27,8 @@
                 
                 @endphp
                 <tr class="border-t">
-                    <td class="px-6 py-2">{{ $index + 1 }}</td>
-                    <td class="px-6 py-2">
+                    <td class="border px-4 py-2">{{ $index + 1 }}</td>
+                    <td class="border px-4 py-2">
                         @php
                             $images = is_array($product->adminProduct->image)
                                 ? $product->adminProduct->image
@@ -41,19 +41,21 @@
                             N/A
                         @endif
                     </td>
-                    <td class="px-6 py-2">{{ $product->user->name }}</td>
-                    <td class="px-6 py-2">{{ $product->quantity }}</td>
-                    <td class="px-6 py-2">{{ $product->paid_price }}</td>
-                    <td class="px-6 py-2">{{ $lineTotal }}</td>
+                    <td class="border px-4 py-2">{{ $product->user->name }}</td>
+                    <td class="border px-4 py-2">{{ $product->quantity }}</td>
+                    <td class="border px-4 py-2">{{ $product->paid_price }}</td>
+                    <td class="border px-4 py-2">{{ $lineTotal }}</td>
                 </tr>
                 
             @endforeach
             <tr class="border-t font-bold">
-                <td class="px-6 py-2 text-right" colspan="3">Total</td>
-                <td class="px-6 py-2">{{ $totalQuantity }}</td>
-                <td class="px-6 py-2">—</td>
-                <td class="px-6 py-2">{{ number_format($totalAmount, 2) }}</td>
+                <td class="border px-4 py-2 text-center" colspan="3">Total</td>
+                <td class="border px-4 py-2">{{ $totalQuantity }}</td>
+                <td class="border px-4 py-2">—</td>
+                <td class="border px-4 py-2">{{ number_format($totalAmount, 2) }}</td>
             </tr>
         </tbody>
-    </table>
+            </table>
+        </div>
+    </x-filament::card>
 </x-filament::page>
