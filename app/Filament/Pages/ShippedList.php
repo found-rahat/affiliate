@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use Filament\Pages\Page;
 use App\Models\CustomerInfo;
 use App\Models\ShippingProvider;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 
@@ -59,6 +60,7 @@ class ShippedList extends Page
         if ($provider) {
             $provider->status = 'Confirm';
             $provider->total_product = $orderCount;
+            $provider->created_at = Carbon::now();
             $provider->save();
         }
 

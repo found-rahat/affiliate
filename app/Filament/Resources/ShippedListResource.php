@@ -37,12 +37,13 @@ class ShippedListResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id'),
-                TextColumn::make('provider_name'),
-                TextColumn::make('total_product'),
-                TextColumn::make('user_name'),
-                TextColumn::make('status'),
-                TextColumn::make('created_at'),
+                TextColumn::make('provider_name')->searchable()->sortable()->toggleable(),
+                TextColumn::make('total_product')->searchable()->sortable()->toggleable(),
+                TextColumn::make('user_name')->searchable()->sortable()->toggleable(),
+                TextColumn::make('status')->searchable()->sortable()->toggleable(),
+                TextColumn::make('created_at')->date('d-M-y'),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])
