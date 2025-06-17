@@ -9,6 +9,7 @@ use Filament\Tables\Table;
 use App\Models\ShippedList;
 use App\Models\ShippingProvider;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -24,44 +25,55 @@ class ShippedListResource extends Resource
     protected static ?string $navigationLabel = 'Shipping list';
     protected static ?int $navigationSort = 7;
 
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (!Auth::user()->can('view all shipped lists')) {
+            $query->where('user_name', Auth::user()->name);
+        }
+
+        return $query;
+    }
+
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                //
-            ]);
+        return $form->schema([
+            //
+        ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('id'),
-                TextColumn::make('provider_name')->searchable()->sortable()->toggleable(),
-                TextColumn::make('total_product')->searchable()->sortable()->toggleable(),
-                TextColumn::make('user_name')->searchable()->sortable()->toggleable(),
-                TextColumn::make('status')->searchable()->sortable()->toggleable(),
-                TextColumn::make('created_at')->date('d-M-y'),
+                TextColumn::make('id'), 
+                TextColumn::make('provider_name')->searchable()->sortable()->toggleable(), 
+                TextColumn::make('total_product')->searchable()->sortable()->toggleable(), 
+                TextColumn::make('user_name')->searchable()->sortable()->toggleable(), 
+                TextColumn::make('status')->searchable()->sortable()->toggleable(), 
+                TextColumn::make('created_at')->date('d-M-y')
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\DeleteAction::make()->visible(fn ($record) => $record->status === 'Pending'),
+                // Tables\Actions\ViewAction::make(), 
+                Tables\Actions\DeleteAction::make()->visible(fn($record) => $record->status === 'Pending')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                    // Tables\Actions\DeleteBulkAction::make()
+                ])
             ]);
     }
 
     public static function getRelations(): array
     {
         return [
-            //
-        ];
+                //
+            ];
     }
 
     public static function getPages(): array
