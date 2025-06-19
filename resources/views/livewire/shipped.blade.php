@@ -85,7 +85,7 @@
                             <td class="border px-4 py-2">{{ $i }}</td>
                             <td class="border px-4 py-2">{{ $order->order_number }}</td>
                             <td class="border px-4 py-2">{{ $order->name }}</td>
-                            <td class="border px-4 py-2">{{ '0' . $order->phone }}</td>
+                            <td class="border px-4 py-2">{{ $order->phone }}</td>
                             <td class="border px-4 py-2">{{ Str::limit($order->address ?? 'N/A', 30) }}</td>
                             <td class="border px-4 py-2">{{ $total }}</td>
                         </tr>
