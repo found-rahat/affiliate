@@ -26,7 +26,7 @@ class NeedProduct extends BaseWidget
                     from collect_product_stock_lists
                     where collect_product_stock_lists.admin_product_id = admin_products.id
                     and stock_status = "Instock"
-                ) <= 200
+                ) <= 5
             ')
             )
             ->columns([
@@ -47,7 +47,7 @@ class NeedProduct extends BaseWidget
                     ->searchable()
                     ->toggleable(),
             ])
-            ->emptyStateHeading('No products found')
+            ->emptyStateHeading('No Need products found')
             ->emptyStateDescription('There are no products available with 5 or fewer in-stock items.');;
     }
 }

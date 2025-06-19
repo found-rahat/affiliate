@@ -25,6 +25,11 @@ class ShippedListResource extends Resource
     protected static ?string $navigationLabel = 'Shipping list';
     protected static ?int $navigationSort = 7;
 
+    public static function canAccess(): bool
+    {
+        return auth()->check() && auth()->user()->hasPermissionTo('Shipped List View');
+    }
+
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();

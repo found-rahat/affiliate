@@ -39,17 +39,19 @@ class OrderListOverview extends BaseWidget
             ->orderBy('date')
             ->pluck('count', 'date')
             ->toArray();
-        //------------------Packing--------------
-        $Packing = CustomerInfo::selectRaw('DATE(shipped_time) as date, COUNT(*) as count')
+
+            //------------------Packing--------------
+        $Packing = CustomerInfo::selectRaw('DATE(packing_time) as date, COUNT(*) as count')
             ->where('status', 'Packing')
-            ->whereBetween('shipped_time', [$startDate, $endDate])
+            ->whereBetween('packing_time', [$startDate, $endDate])
             ->groupBy('date')
             ->orderBy('date')
             ->pluck('count', 'date')
             ->toArray();
+        
         //------------------Hold--------------
         $Hold = CustomerInfo::selectRaw('DATE(hold_time) as date, COUNT(*) as count')
-            ->where('status', 'hold')
+            ->where('status', 'Hold')
             ->whereBetween('hold_time', [$startDate, $endDate])
             ->groupBy('date')
             ->orderBy('date')
@@ -74,6 +76,7 @@ class OrderListOverview extends BaseWidget
             ->pluck('count', 'date')
             ->toArray();
 
+            
         $PendingData = [];
         $ProcessingData = [];
         $PackingData = [];
@@ -107,17 +110,17 @@ class OrderListOverview extends BaseWidget
                 ->color('success')
                 ->chart($ProcessingData),
 
-            Stat::make('', CustomerInfo::where('status', 'Shipped')->count())
-                ->description('Shipped Order')
-                ->descriptionIcon('heroicon-m-arrow-trending-down')
-                ->color('success')
-                ->chart($shippedData),
-
             Stat::make('', CustomerInfo::where('status', 'Packing')->count())
                 ->description('Packing Order')
                 ->descriptionIcon('heroicon-m-arrow-trending-down')
                 ->color('warning')
                 ->chart($PackingData),
+
+            Stat::make('', CustomerInfo::where('status', 'Shipped')->count())
+                ->description('Shipped Order')
+                ->descriptionIcon('heroicon-m-arrow-trending-down')
+                ->color('success')
+                ->chart($shippedData),
 
             Stat::make('', CustomerInfo::where('status', 'Hold')->count())
                 ->description('Hold Order')
