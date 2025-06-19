@@ -26,6 +26,11 @@ return new class extends Migration
             $table->integer('item_quentity'); //total quentity
             $table->integer('total_paid'); //total price
 
+            $table->integer('buy_price')->nullable(); // This works in SQLite
+            $table->integer('aff_user_paid')->nullable();
+            $table->integer('cod_paid')->nullable();
+            $table->string('cod_paid_user')->nullable();
+
             $table->string('order_create_time');
 
             $table->integer('discount')->nullable(); //if
@@ -41,11 +46,19 @@ return new class extends Migration
             $table->string('shipping_provider'); //pathao
 
             $table->string('shipping_provider_delivery_code')->nullable();
+
+            $table->string('packing_type')->nullable();
+            $table->dateTime('packing_time')->nullable();
+            $table->string('packing_user')->nullable();
             
             $table->string('shipped_type')->nullable(); //if outbound then pending confirm then change confirm
             $table->string('shipped_time')->nullable();
             $table->string('shipped_user')->nullable();
             $table->integer('shippment_id')->nullable();
+
+            $table->string('return_type')->nullable();
+            $table->string('return_time')->nullable();
+            $table->string('return_user')->nullable();
 
             $table->integer('pre_payment')->nullable(); //if
             $table->string('pre_payment_user')->nullable();
@@ -54,6 +67,8 @@ return new class extends Migration
 
             $table->string('hold_reason')->nullable();
             $table->string('hold_time')->nullable();
+
+            $table->string('delivery_failed_time')->nullable();
 
             $table->string('cancel_reason')->nullable();
             $table->string('cancel_time')->nullable();

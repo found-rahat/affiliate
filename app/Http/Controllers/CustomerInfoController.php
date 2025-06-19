@@ -18,6 +18,7 @@ class CustomerInfoController extends Controller
         $user = Auth::user();
         $grandTotal = 0;
         $grandqty = 0;
+        $totalBuyPrice = 0;
 
         $cartItems = AddCart::with('product')->where('user_name', $user->name)->get();
         foreach ($cartItems as $item) {
@@ -26,6 +27,9 @@ class CustomerInfoController extends Controller
             $total = $price * $qty;
             $grandTotal += $total;
             $grandqty += $qty;
+
+            $buy_price = (float) $item->product->buy_price;
+            $totalBuyPrice += $buy_price * $qty; // sob product er buy price * qty jog hocche
         }
 
         $curior = CuriorServiceProviderCost::where('title', $request->curior)->get();
@@ -57,6 +61,7 @@ class CustomerInfoController extends Controller
             'shipping_fee' => $amount,
             'shipping_provider' => $provider,
             'order_note' => $request->note,
+            'buy_price'=> $totalBuyPrice,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

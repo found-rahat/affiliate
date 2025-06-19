@@ -22,21 +22,24 @@ class ViewCustomerInfo extends ViewRecord
             Actions\EditAction::make()->visible(fn (CustomerInfo $record) => in_array($record->status, ['Pending', 'Hold','Processing'])),
 //-----------------Processing Button-----------------
             Action::make('markAsDeliveredProcessing')
-            ->label('Confirm Order')
-            ->color('success')
-            ->icon('heroicon-o-check-badge')
-            ->requiresConfirmation()
-            ->action(function (CustomerInfo $record) {
-                $record->status = 'Processing';
-                $record->confirm_user = Auth::user()->name;
-                $record->confirm_time = \Carbon\Carbon::now();
-                $record->save();
+                ->label('Confirm Order')
+                ->color('success')
+                ->icon('heroicon-o-check-badge')
+                ->requiresConfirmation()
+                ->action(function (CustomerInfo $record) {
+                    $record->status = 'Processing';
+                    $record->confirm_user = Auth::user()->name;
+                    $record->confirm_time = \Carbon\Carbon::now();
+                    $record->save();
 
                 Notification::make()
                     ->title('Status updated')
                     ->body("Order #{$record->order_number} marked as Processing.")
                     ->success()
                     ->send();
+                    
+                return redirect(\App\Filament\Resources\CustomerInfoResource::getUrl('index'));
+                    
             })
             ->visible(fn (CustomerInfo $record) => in_array($record->status, ['Pending', 'Hold'])),
 //-----------------Hold Button-----------------
@@ -61,7 +64,8 @@ class ViewCustomerInfo extends ViewRecord
                     ->body("Order Number #{$record->order_number} marked as Hold.")
                     ->success()
                     ->send();
-                return redirect()->to(CustomerInfoResource::getUrl('view', ['record' => $record->getKey()]));
+                // return redirect()->to(CustomerInfoResource::getUrl('view', ['record' => $record->getKey()]));
+                return redirect(\App\Filament\Resources\CustomerInfoResource::getUrl('index'));
             })
             ->visible(fn (CustomerInfo $record) => in_array($record->status, ['Pending', 'Processing'])),
 

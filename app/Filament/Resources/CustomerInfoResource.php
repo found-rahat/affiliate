@@ -53,6 +53,7 @@ class CustomerInfoResource extends Resource
             ->schema([
                 Section::make('Customer Info')
                     ->schema([
+                        TextInput::make('order_number')->columnSpan(2), 
                         TextInput::make('name')->columnSpan(2), 
                         TextInput::make('address')->columnSpan(2), 
                         TextInput::make('phone')->columnSpan(2), 
@@ -88,7 +89,7 @@ class CustomerInfoResource extends Resource
             ->columns([
                 TextColumn::make('order_number')->searchable()->sortable()->toggleable(),
                 TextColumn::make('name')->label('Customer Info')->searchable()->sortable()->toggleable()
-                    ->html()
+                    ->html()->limit(40)
                     ->getStateUsing(
                         fn($record) => "{$record->name}<br> {$record->address}<br>{$record->phone}"
                     ),
@@ -175,7 +176,7 @@ class CustomerInfoResource extends Resource
             ])
             ->filters([])
             ->actions([
-                Tables\Actions\ViewAction::make(), 
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
                     ->visible(fn(CustomerInfo $record) => in_array($record->status, ['Pending', 'Hold', 'Processing']))
                 ])
