@@ -66,6 +66,11 @@ class ListCustomerInfos extends ListRecords
                 ->modifyQueryUsing(function(Builder $query){
                     return $query->where('status','Canceled');
                 }),
+            'Unpaid'=> Tab::make()
+                ->badge(CustomerInfo::where('payment_status', 'unpaid')->where('status','Shipped')->count())
+                ->modifyQueryUsing(function(Builder $query){
+                    return $query->where('payment_status','unpaid')->where('status', 'Shipped');
+                }),
         ];
     }
 }
